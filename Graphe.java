@@ -18,6 +18,8 @@ interface Graphe<T> {
 
     boolean existeCycle();
 
+    void afficherChemin(T source, T destination);
+
 }
 
 

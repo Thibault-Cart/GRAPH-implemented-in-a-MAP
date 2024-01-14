@@ -43,5 +43,10 @@ public class DemoGraphe {
         System.out.println("Verification de cycle apres suppression de la relation 5 -> 3");
         gr.existeCycle();
 
+        gr.afficherChemin(0, 6);
+        gr.afficherChemin(0, 4);
+        gr.afficherChemin(3, 5);
     }
+
+    
 }

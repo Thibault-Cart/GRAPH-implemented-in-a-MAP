@@ -4,10 +4,7 @@
  * @author Ch. Stettler - HEG-Genève puis modifier par Thibault Cart
  */
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 class GrapheMap<T> implements Graphe<T> {
     private Map<T, Set<T>> lstRelations;
@@ -207,7 +204,6 @@ class GrapheMap<T> implements Graphe<T> {
      *
      * @return true si un cycle existe, false sinon
      */
-
     @Override
     public boolean existeCycle() {
         dejaVisites = new HashSet<>();
@@ -252,6 +248,66 @@ class GrapheMap<T> implements Graphe<T> {
         dejaVisites.remove(noeud);
         return false;
     }
+
+
+    /**
+     * Affiche le chemin entre deux noeuds
+     *
+     * @param source      le noeud source
+     * @param destination le noeud destination
+     */
+    public void afficherChemin(T source, T destination) {
+        dejaVisites = new HashSet<>();
+        List<T> chemin = new ArrayList<>();
+        boolean cheminExiste = trouverChemin(source, destination, chemin);
+
+        if (cheminExiste) {
+            System.out.println("Chemin entre " + source + " et " + destination + ": ");
+
+            // On enlève le noeud source du chemin
+            chemin.remove(0);
+
+            for (T node : chemin) {
+                System.out.println("-->" + node);
+            }
+            System.out.println();
+        } else {
+            System.out.println("Pas de chemin entre " + source + " et " + destination);
+        }
+    }
+
+    /**
+     * Utilitaire pour trouver un chemin entre deux noeuds en utilisant la récursivité
+     *
+     * @param current     le noeud courant
+     * @param destination le noeud destination
+     * @param chemin      la liste pour stocker le chemin
+     * @return true si un chemin existe, false sinon
+     */
+    private boolean trouverChemin(T current, T destination, List<T> chemin) {
+        dejaVisites.add(current);
+        chemin.add(current);
+
+        if (current.equals(destination)) {
+            return true;
+        }
+
+        Set<T> neighbors = lstRelations.get(current);
+        if (neighbors != null) {
+            for (T neighbor : neighbors) {
+                if (!dejaVisites.contains(neighbor)) {
+                    if (trouverChemin(neighbor, destination, chemin)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Backtrack if the current path does not lead to the destination
+        chemin.remove(chemin.size() - 1);
+        return false;
+    }
+
 
 }
 
