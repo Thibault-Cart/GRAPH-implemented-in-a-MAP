@@ -1,13 +1,13 @@
 /**
  * Graphe de type abstrait T mis dans une Map
  *
- * @author Ch. Stettler - HEG-GenËve puis modifier par Thibault Cart
+ * @author Ch. Stettler - HEG-Gen√®ve puis modifier par Thibault Cart
  */
 
 import java.util.*;
 
-class GrapheMap<T> implements Graphe<T> {
-    private Map<T, Set<T>> lstRelations;
+class GraphDistance<T> {
+    private Map<T, HashMap<T, Integer>> lstRelations;
 
     private Set<T> dejaVisites;
 
@@ -15,7 +15,7 @@ class GrapheMap<T> implements Graphe<T> {
     /**
      * Constructeur
      */
-    public GrapheMap() {
+    public GraphDistance() {
         lstRelations = new HashMap<>();
     }
 
@@ -26,8 +26,7 @@ class GrapheMap<T> implements Graphe<T> {
      * @param source      le noeud source
      * @param destination le noeud destination
      */
-    @Override
-    public void addRelation(T source, T destination) {
+    public void addRelation(T source, T destination, int distance) {
 
         //verifie si la source et la destination sont deja dans la liste
         if (!lstRelations.keySet().contains(source)) {
@@ -37,19 +36,19 @@ class GrapheMap<T> implements Graphe<T> {
             lstRelations.put(destination, null);
         }
         // recupere la liste des relations de la source
-        Set<T> relations = lstRelations.get(source);
+        HashMap<T, Integer> relations = lstRelations.get(source);
         // si la liste est null, on la cree
         if (relations == null) {
-            relations = new HashSet<>();
+            relations = new HashMap<T, Integer>();
             // on ajoute la destination a la liste
-            relations.add(destination);
+            relations.put(destination, distance);
             // on ajoute la liste a la source
             lstRelations.put(source, relations);
         } else {
             // sinon on ajoute la destination a la liste
-            relations.add(destination);
+            relations.put(destination, distance);
         }
-        System.out.println("Relation ajoutÈe : " + source + " -> " + destination);
+        System.out.println("Relation ajout√©e : " + source + " -> " + destination);
     }
 
 
@@ -59,7 +58,7 @@ class GrapheMap<T> implements Graphe<T> {
      * @param source      le noeud source
      * @param destination le noeud destination
      */
-    @Override
+
     public void deleteRelation(T source, T destination) {
         //si la source ou la destination n'existe pas dans la liste, on ne fait rien
         if (!lstRelations.keySet().contains(source) || !lstRelations.keySet().contains(destination)) {
@@ -67,7 +66,7 @@ class GrapheMap<T> implements Graphe<T> {
         }
 
         // recupere la liste des relations de la source
-        Set<T> relations = lstRelations.get(source);
+        HashMap<T, Integer> relations = lstRelations.get(source);
         // si la liste est null, on la cree
         if (relations == null) {
             return;
@@ -75,7 +74,7 @@ class GrapheMap<T> implements Graphe<T> {
             // sinon on supprime la destination a la liste
             relations.remove(destination);
         }
-        System.out.println("Relation supprimÈe : " + source + " -> " + destination);
+        System.out.println("Relation supprim√©e : " + source + " -> " + destination);
     }
 
 
@@ -86,9 +85,9 @@ class GrapheMap<T> implements Graphe<T> {
      * @param destination le noeud destination
      * @return true si la relation existe, false sinon
      */
-    @Override
+
     public boolean existeRelation(T source, T destination) {
-        boolean existe = lstRelations.get(source) != null && lstRelations.get(source).contains(destination);
+        boolean existe = lstRelations.get(source) != null && lstRelations.get(source).containsKey(destination);
         if (existe) {
             System.out.println("La relation existe : " + source + " -> " + destination);
         } else {
@@ -104,7 +103,6 @@ class GrapheMap<T> implements Graphe<T> {
      *
      * @param source le noeud source
      */
-    @Override
     public void parcoursProfondeur(T source) {
         dejaVisites = new HashSet<>();
         parcoursProfondeurRecursif(source);
@@ -121,17 +119,17 @@ class GrapheMap<T> implements Graphe<T> {
 
         if (dejaVisites.contains(noeud)) {
             return;
-        }   // si noeud dÈj‡ visitÈ ==> return
+        }   // si noeud d√©j√† visit√© ==> return
         dejaVisites.add(noeud);
 
         // sinon affiche le noeud, puis appelle parcoursProfondeurRecursif pour tous ses voisins
         System.out.print(noeud + " ");
 
-        Set<T> voisins = lstRelations.get(noeud);
+        HashMap<T, Integer> voisins = lstRelations.get(noeud);
         if (voisins == null) {
             return;
         }
-        for (T voisin : voisins) {
+        for (T voisin : voisins.keySet()) {
 
             parcoursProfondeurRecursif(voisin);
         }
@@ -144,7 +142,7 @@ class GrapheMap<T> implements Graphe<T> {
      * @param destination le noeud destination
      * @return true si un chemin existe, false sinon
      */
-    @Override
+
     public boolean existeChemin(T source, T destination) {
         dejaVisites = new HashSet<>();
         boolean existeChemin = existeCheminRecursif(source, destination);
@@ -165,7 +163,7 @@ class GrapheMap<T> implements Graphe<T> {
      * @return true si un chemin existe, false sinon
      */
     private boolean existeCheminRecursif(T source, T destination) {
-        Set<T> allnode = lstRelations.get(source);
+        HashMap<T, Integer> allnode = lstRelations.get(source);
 
         if (source.equals(destination)) {
             return true;
@@ -174,13 +172,13 @@ class GrapheMap<T> implements Graphe<T> {
             return false;
         } else {
 
-            for (T noeud : allnode) {
+            for (T noeud : allnode.keySet()) {
                 if (noeud.equals(destination)) {
                     return true;
                 }
 
             }
-            for (T noeud : allnode) {
+            for (T noeud : allnode.keySet()) {
                 dejaVisites.add(noeud);
                 if (noeud != null && !dejaVisites.contains(noeud)) {
                     return false;
@@ -204,7 +202,7 @@ class GrapheMap<T> implements Graphe<T> {
      *
      * @return true si un cycle existe, false sinon
      */
-    @Override
+
     public boolean existeCycle() {
         dejaVisites = new HashSet<>();
         Set<T> tousLesNoeuds = lstRelations.keySet();
@@ -231,9 +229,9 @@ class GrapheMap<T> implements Graphe<T> {
     private boolean existeCycleRecursif(T noeud, T parent) {
         dejaVisites.add(noeud);
 
-        Set<T> voisins = lstRelations.get(noeud);
+        HashMap<T, Integer> voisins = lstRelations.get(noeud);
         if (voisins != null) {
-            for (T voisin : voisins) {
+            for (T voisin : voisins.keySet()) {
                 if (!dejaVisites.contains(voisin)) {
                     if (existeCycleRecursif(voisin, noeud)) {
                         return true;
@@ -264,7 +262,7 @@ class GrapheMap<T> implements Graphe<T> {
         if (cheminExiste) {
             System.out.println("Chemin entre " + source + " et " + destination + ": ");
 
-            // On enlËve le noeud source du chemin
+            // On enl√®ve le noeud source du chemin
             chemin.remove(0);
 
             for (T node : chemin) {
@@ -277,7 +275,7 @@ class GrapheMap<T> implements Graphe<T> {
     }
 
     /**
-     * Utilitaire pour trouver un chemin entre deux noeuds en utilisant la rÈcursivitÈ
+     * Utilitaire pour trouver un chemin entre deux noeuds en utilisant la r√©cursivit√©
      *
      * @param current     le noeud courant
      * @param destination le noeud destination
@@ -292,9 +290,9 @@ class GrapheMap<T> implements Graphe<T> {
             return true;
         }
 
-        Set<T> neighbors = lstRelations.get(current);
+        HashMap<T, Integer> neighbors = lstRelations.get(current);
         if (neighbors != null) {
-            for (T neighbor : neighbors) {
+            for (T neighbor : neighbors.keySet()) {
                 if (!dejaVisites.contains(neighbor)) {
                     if (trouverChemin(neighbor, destination, chemin)) {
                         return true;
@@ -309,6 +307,82 @@ class GrapheMap<T> implements Graphe<T> {
     }
 
 
+    /**
+     * Affiche les chemins les plus courts entre deux noeuds en utilisant l'algorithme de Dijkstra
+     *
+     * @param source      le noeud source
+     * @param destination le noeud destination
+     */
+    public void afficherCheminsPlusCourts(T source, T destination) {
+        // V√©rifier si le graphe contient les n≈ìuds source et destination
+        if (!lstRelations.containsKey(source) || !lstRelations.containsKey(destination)) {
+            System.out.println("Les n≈ìuds source ou destination ne sont pas pr√©sents dans le graphe.");
+            return;
+        }
+
+        // Initialiser les distances et les chemins
+        Map<T, Integer> distances = new HashMap<>();
+        Map<T, List<T>> chemins = new HashMap<>();
+        PriorityQueue<NodeDistance<T>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(NodeDistance::getDistance));
+
+        for (T node : lstRelations.keySet()) {
+            distances.put(node, Integer.MAX_VALUE);
+            chemins.put(node, new ArrayList<>());
+        }
+
+        distances.put(source, 0);
+        priorityQueue.offer(new NodeDistance<>(source, 0));
+
+        while (!priorityQueue.isEmpty()) {
+            NodeDistance<T> currentNode = priorityQueue.poll();
+
+            if (currentNode.getDistance() > distances.get(currentNode.getNode())) {
+                continue;
+            }
+
+            Map<T, Integer> neighbors = lstRelations.get(currentNode.getNode());
+            if (neighbors != null) {
+                for (Map.Entry<T, Integer> neighborEntry : neighbors.entrySet()) {
+                    T neighbor = neighborEntry.getKey();
+                    int newDistance = distances.get(currentNode.getNode()) + neighborEntry.getValue();
+
+                    if (newDistance < distances.get(neighbor)) {
+                        distances.put(neighbor, newDistance);
+                        List<T> newPath = new ArrayList<>(chemins.get(currentNode.getNode()));
+                        newPath.add(currentNode.getNode());
+                        chemins.put(neighbor, newPath);
+                        priorityQueue.offer(new NodeDistance<>(neighbor, newDistance));
+                    }
+                }
+            }
+
+        }
+
+        // Afficher les chemins les plus courts
+        List<T> shortestPath = chemins.get(destination);
+        System.out.println("Chemin le plus court entre " + source + " et " + destination + ": " + shortestPath);
+        System.out.println("Distance totale : " + distances.get(destination));
+    }
+
+    private static class NodeDistance<T> {
+        private final T node;
+        private final int distance;
+
+        public NodeDistance(T node, int distance) {
+            this.node = node;
+            this.distance = distance;
+        }
+
+        public T getNode() {
+            return node;
+        }
+
+        public int getDistance() {
+            return distance;
+        }
+    }
 }
+
+
 
 
